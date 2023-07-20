@@ -1,5 +1,5 @@
 python finetune.py \
-    --base_model 'models/vicuna-7b-v1.1' \
-    --data_path 'alpaca_data_gpt4.json' \
+    --base_model 'models/llama-7b' \
+    --data_path 'alpaca_data.json' \
     --output_dir './lora-alpaca' \
-    --num_epochs 1
+    ----num_epochs 1

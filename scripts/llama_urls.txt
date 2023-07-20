@@ -36,3 +36,4 @@ https://huggingface.co/decapoda-research/llama-7b-hf/resolve/main/generation_con
 https://huggingface.co/decapoda-research/llama-7b-hf/resolve/main/tokenizer.model
 https://huggingface.co/decapoda-research/llama-7b-hf/resolve/main/pytorch_model.bin.index.json
 https://huggingface.co/decapoda-research/llama-7b-hf/resolve/main/special_tokens_map.json
+https://github.com/Quartzing/MiniGPT-4/blob/main/models/llama/tokenizer_config.json
