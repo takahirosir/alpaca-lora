@@ -1,31 +1,15 @@
-# 🦙🌲🤏 Alpaca-LoRA
-
-- 🤗 **Try the pretrained model out [here](https://huggingface.co/spaces/tloen/alpaca-lora), courtesy of a GPU grant from Huggingface!**
-- Users have created a Discord server for discussion and support [here](https://discord.gg/prbq284xX5)
-- 4/14: Chansung Park's GPT4-Alpaca adapters: https://github.com/tloen/alpaca-lora/issues/340
-
-This repository contains code for reproducing the [Stanford Alpaca](https://github.com/tatsu-lab/stanford_alpaca) results using [low-rank adaptation (LoRA)](https://arxiv.org/pdf/2106.09685.pdf).
-We provide an Instruct model of similar quality to `text-davinci-003` that can run [on a Raspberry Pi](https://twitter.com/miolini/status/1634982361757790209) (for research),
-and the code is easily extended to the `13b`, `30b`, and `65b` models.
-
-In addition to the training code, which runs within hours on a single RTX 4090,
-we publish a script for downloading and inference on the foundation model and LoRA,
-as well as the resulting [LoRA weights themselves](https://huggingface.co/tloen/alpaca-lora-7b/tree/main).
-To fine-tune cheaply and efficiently, we use Hugging Face's [PEFT](https://github.com/huggingface/peft)
-as well as Tim Dettmers' [bitsandbytes](https://github.com/TimDettmers/bitsandbytes).
-
-Without hyperparameter tuning, the LoRA model produces outputs comparable to the Stanford Alpaca model. (Please see the outputs included below.) Further tuning might be able to achieve better performance; I invite interested users to give it a try and report their results.
-
 ### Local Setup
-
 1. Install dependencies
 
    ```bash
    pip install -r requirements.txt
    ```
-
-1. If bitsandbytes doesn't work, [install it from source.](https://github.com/TimDettmers/bitsandbytes/blob/main/compile_from_source.md) Windows users can follow [these instructions](https://github.com/tloen/alpaca-lora/issues/17).
-
+### Download Model
+1. Download llama-7b
+    ```bash
+    bash scripts/llama-7b.sh
+    ```
+2. Download other model such like vicuna or alpaca please go to hf
 ### Training (`finetune.py`)
 
 This file contains a straightforward application of PEFT to the LLaMA model,
@@ -36,9 +20,9 @@ Example usage:
 
 ```bash
 python finetune.py \
-    --base_model 'decapoda-research/llama-7b-hf' \
-    --data_path 'yahma/alpaca-cleaned' \
-    --output_dir './lora-alpaca'
+    --base_model 'model/llama-7b-hf' \
+    --data_path 'overfitting' \
+    --output_dir './'output
 ```
 
 We can also tweak our hyperparameters:
