@@ -1,0 +1,2 @@
+https://huggingface.co/tloen/alpaca-lora-7b/blob/main/adapter_config.json
+https://huggingface.co/tloen/alpaca-lora-7b/blob/main/adapter_model.bin
