@@ -1,7 +1,6 @@
-'''For finetuning with lora'''
 import os
 import sys
-from typing import List
+from typing import List #  In order to specify the types of parameters and return values by List
 
 import fire
 import torch
@@ -45,7 +44,7 @@ def train(
     lora_target_modules: List[str] = [
         "q_proj",
         "v_proj",
-    ],
+    ], # define lora_target_modules as a list type and string type in such list
     # llm hyperparams
     train_on_inputs: bool = True,  # if False, masks out inputs in loss
     add_eos_token: bool = False,
@@ -274,7 +273,7 @@ def train(
         )
     ).__get__(model, type(model))
 
-    if torch.__version__ >= "2" and sys.platform != "win32":
+    if torch.__version__ >= "2" and sys.platform != "win32":  # determine torch version and system whether or not win32
         model = torch.compile(model)
 
     trainer.train(resume_from_checkpoint=resume_from_checkpoint)
