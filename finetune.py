@@ -57,7 +57,7 @@ def train(
     resume_from_checkpoint: str = None,  # either training checkpoint or final adapter
     prompt_template_name: str = "alpaca",  # The prompt template to use, will default to alpaca.
 ):
-    if int(os.environ.get("LOCAL_RANK", 0)) == 0:
+    if int(os.environ.get("LOCAL_RANK", 0)) == 0: #  if LOCAL_RANK is NOT exit, return 0 
         print(
             f"Training Alpaca-LoRA model with params:\n"
             f"base_model: {base_model}\n"
@@ -91,10 +91,11 @@ def train(
     prompter = Prompter(prompt_template_name)
 
     device_map = "auto"
-    world_size = int(os.environ.get("WORLD_SIZE", 1))
-    ddp = world_size != 1
+    world_size = int(os.environ.get("WORLD_SIZE", 1)) # 环境变量WORLD_SIZE不存在时返回1
+    # os.environ.get()是python中os模块获取环境变量的一个方法,如果有这个键,返回对应的值,如果没有,则返回none
+    ddp = world_size != 1  # if world_size == 1, ddp=false; if world_size != 1, ddp=true
     if ddp:
-        device_map = {"": int(os.environ.get("LOCAL_RANK") or 0)}
+        device_map = {"": int(os.environ.get("LOCAL_RANK") or 0)} # device_map will be a dict and '' will be key, int() or 0 will be value
         gradient_accumulation_steps = gradient_accumulation_steps // world_size
 
     # Check if parameter passed or if set within environ
@@ -103,7 +104,7 @@ def train(
     )
     # Only overwrite environ if wandb param passed
     if len(wandb_project) > 0:
-        os.environ["WANDB_PROJECT"] = wandb_project
+        os.environ["WANDB_PROJECT"] = wandb_project # os.environ['环境变量名称']='新环境变量值' #其中key和value均为string类型
     if len(wandb_watch) > 0:
         os.environ["WANDB_WATCH"] = wandb_watch
     if len(wandb_log_model) > 0:
@@ -193,6 +194,8 @@ def train(
         checkpoint_name = os.path.join(
             resume_from_checkpoint, "pytorch_model.bin"
         )  # Full checkpoint
+        # chechpoint_name will be 'resume_from_checkpoint'\pythorch_model.bin
+        # os.path.join()函数用于路径拼接文件路径，可以传入多个路径
         if not os.path.exists(checkpoint_name):
             checkpoint_name = os.path.join(
                 resume_from_checkpoint, "adapter_model.bin"
