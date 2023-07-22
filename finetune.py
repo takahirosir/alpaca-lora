@@ -36,7 +36,7 @@ def train(
     num_epochs: int = 3,
     learning_rate: float = 3e-4,
     cutoff_len: int = 256,
-    val_set_size: int = 2000, # validation set
+    val_set_size: int = 2000, # validation set which measns it will take such numbers data for test(validation)
     # lora hyperparams
     lora_r: int = 8,
     lora_alpha: int = 16,
@@ -247,7 +247,7 @@ def train(
             save_strategy="steps",
             eval_steps=200 if val_set_size > 0 else None,
             save_steps=1,
-            # save_steps=200,
+            # save_steps=200, which means that it will save every 1 steps as result(checkpoint)
             output_dir=output_dir,
             save_total_limit=3,
             # save_total_limit='x' represent that there will save the latest 'x' checkpoint 
