@@ -287,3 +287,6 @@ def train(
 
 if __name__ == "__main__":
     fire.Fire(train)
+# 定义若干函数，使用 fire.Fire()
+# 方便修改调用的函数中的默认参数的值
+# 理解成点火，把定义的函数都暴露出来运行
