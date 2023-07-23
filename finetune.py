@@ -36,7 +36,8 @@ def train(
     num_epochs: int = 3,
     learning_rate: float = 3e-4,
     cutoff_len: int = 256,
-    val_set_size: int = 2000, # validation set which measns it will take such numbers data for test(validation)
+    val_set_size: int = 2000, # validation set which measns it will take such numbers data for test(validation验证集)
+    # the following some args will be influnced by this paramater 'evaluation_strategy', 'eval_steps', 'load_best_model_at_end' in trainer.args
     # lora hyperparams
     lora_r: int = 8,
     lora_alpha: int = 16,
@@ -239,28 +240,35 @@ def train(
         train_dataset=train_data,
         eval_dataset=val_data,
         args=transformers.TrainingArguments(
-            per_device_train_batch_size=micro_batch_size,
-            gradient_accumulation_steps=gradient_accumulation_steps,
-            warmup_steps=100,
-            num_train_epochs=num_epochs,
-            learning_rate=learning_rate,
-            fp16=True,
+            per_device_train_batch_size=micro_batch_size,  # per_device_train_batch_size（：obj：`int`，`optional`，defaults to 8）： The batch size per GPU/TPU core/CPU for training 每个GPU / TPU内核/ CPU的批处理大小
+            gradient_accumulation_steps=gradient_accumulation_steps, # gradient_accumulation_steps: (:obj:`int`, `optional`, defaults to 1): Number of updates steps to accumulate the gradients for, before performing a backward/update pass.在执行反向传播/更新过程之前，要累积其梯度的更新步骤数
+            warmup_steps=100, # warmup_steps (:obj:`int`, `optional`, defaults to 0):Number of steps used for a linear warmup from 0 to :obj:`learning_rate`.线性预热所用的步数（从0到：learning_rate）。
+            num_train_epochs=num_epochs, # num_train_epochs(:obj:`float`, `optional`, defaults to 3.0): Total number of training epochs to perform.要执行的训练轮数总数
+            learning_rate=learning_rate, # learning_rate (:obj:`float`, `optional`, defaults to 5e-5):The initial learning rate for Adam.Adam初始学习率。#这里不知道为什么强调Adam？
+            fp16=True,# fp16 (:obj:`bool`, `optional`, defaults to :obj:`False`):Whether to use 16-bit (mixed) precision training (through NVIDIA apex) instead of 32-bit training.是否使用16位混合精度训练（通过NVIDIA apex）而不是32位训练
+            
             # logging_steps=10, every 10 steps will have an loss number
-            logging_steps=1,
-            optim="adamw_torch",
+            logging_steps=1, # logging_steps (:obj:`int`, `optional`, defaults to 500):Number of update steps between two logs.两个日志记录之间的更新步骤数。
+            optim="adamw_torch", # 不是TrainingArguments里的默认参数 mean use adamw optimization(kind of 优化器)
             evaluation_strategy="steps" if val_set_size > 0 else "no",
-            save_strategy="steps",
-            eval_steps=200 if val_set_size > 0 else None,
-            save_steps=1,
-            # save_steps=200, which means that it will save every 1 steps as result(checkpoint)
-            output_dir=output_dir,
-            save_total_limit=3,
+            # evaluation_strategy (:obj:`str` or :class:`~transformers.trainer_utils.EvaluationStrategy`, `optional`, defaults to :obj:`"no"`):
+            # The evaluation strategy to adopt during training. Possible values are: 评估策略
+            #  :obj:`"no"`: No evaluation is done during training.训练期间不进行评估
+            #  :obj:`"steps"`: Evaluation is done (and logged) every :obj:`eval_steps`.每个 :obj:`eval_steps` 都会进行评估（并记录）
+            #  :obj:`"epoch"`: Evaluation is done at the end of each epoch.评估在每个 epoch 结束时完成
+            save_strategy="steps", # 不是TrainingArguments里的默认参数 mean every steps will be save?
+            eval_steps=200 if val_set_size > 0 else None,# eval_steps (:obj:`int`, `optional`):Number of update steps between two evaluations if :obj:`evaluation_strategy="steps"`. Will default to the same value as :obj:`logging_steps` if not set.如果:obj:`evaluation_strategy="steps"`，则两次评估之间的更新步骤数
+            save_steps=1,# save_steps (:obj:`int`, `optional`, defaults to 500):Number of updates steps before two checkpoint saves.
+            # save_steps=200, which means that it will save every 200 steps as result(checkpoint)
+            output_dir=output_dir, # output_dir (:obj:`str`):The output directory where the model predictions and checkpoints will be written.模型预测和检查点的输出目录。必须声明的字段
+            save_total_limit=3, # save_total_limit (:obj:`int`, `optional`):If a value is passed, will limit the total amount of checkpoints. Deletes the older checkpoints in :obj:`output_dir`.如果设置具体数值，将限制checkpoints的总数并覆盖旧的checkpoints
             # save_total_limit='x' represent that there will save the latest 'x' checkpoint 
-            load_best_model_at_end=True if val_set_size > 0 else False,
-            ddp_find_unused_parameters=False if ddp else None,
-            group_by_length=group_by_length,
-            report_to="wandb" if use_wandb else None,
-            run_name=wandb_run_name if use_wandb else None,
+            load_best_model_at_end=True if val_set_size > 0 else False, # load_best_model_at_end (:obj:`bool`, `optional`, defaults to :obj:`False`):Whether or not to load the best model found during training at the end of training.是否在训练结束时加载训练期间找到的最佳模型
+            ddp_find_unused_parameters=False if ddp else None, # ddp_find_unused_parameters (:obj:`bool`, `optional`):When using distributed training, the value of the flag :obj:`find_unused_parameters` passed to:obj:`DistributedDataParallel`. Will default to :obj:`False` if gradient checkpointing is used, :obj:`True`otherwise.
+            # 使用分布式训练时，:obj:`find_unused_pa​​rameters` 的值传递给:obj:`DistributedDataParallel`。如果使用梯度checkpointing，则默认为 :obj:`False`，否则为`True`
+            group_by_length=group_by_length, # group_by_length (:obj:`bool`, `optional`, defaults to :obj:`False`):Whether or not to group together samples of roughly the same legnth in the training dataset (to minimize padding applied and be more efficient). Only useful if applying dynamic padding.是否将训练数据集中长度大致相同的样本分组在一起（以最小化应用填充并提高效率）。仅在应用动态填充时有用
+            report_to="wandb" if use_wandb else None, # 用于报告结果和日志的集成列表 use wandb
+            run_name=wandb_run_name if use_wandb else None, # run_name (:obj:`str`, `optional`):A descriptor for the run. Typically used for `wandb <https://www.wandb.com/>`_ logging.
         ),
         data_collator=transformers.DataCollatorForSeq2Seq(
             tokenizer, pad_to_multiple_of=8, return_tensors="pt", padding=True
