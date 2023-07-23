@@ -234,7 +234,7 @@ def train(
         model.is_parallelizable = True
         model.model_parallel = True
 
-    trainer = transformers.Trainer(
+    trainer = transformers.Trainer( # must be used on GPU, Trainer will be much more slower on CPU
         model=model,
         train_dataset=train_data,
         eval_dataset=val_data,
@@ -278,7 +278,7 @@ def train(
     if torch.__version__ >= "2" and sys.platform != "win32":  # determine torch version and system whether or not win32, in general we use torchversion more than 2
         model = torch.compile(model)
 
-    trainer.train(resume_from_checkpoint=resume_from_checkpoint)
+    trainer.train(resume_from_checkpoint=resume_from_checkpoint) # used trainer(transformers.Trainer).train to run
 
     model.save_pretrained(output_dir)
 
