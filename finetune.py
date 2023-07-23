@@ -113,7 +113,7 @@ def train(
     model = LlamaForCausalLM.from_pretrained(
         base_model,
         load_in_8bit=True,
-        torch_dtype=torch.float16,
+        torch_dtype=torch.float16, # data type of the quantized Tensor 量化张量的数据类型 the original torch is float32 and we learn from the idea from quantization to reduce model inference time
         device_map=device_map,
     )
 
@@ -206,7 +206,7 @@ def train(
         # The two files above have a different name depending on how they were saved, but are actually the same.
         if os.path.exists(checkpoint_name):
             print(f"Restarting from {checkpoint_name}")
-            adapters_weights = torch.load(checkpoint_name)
+            adapters_weights = torch.load(checkpoint_name)  # torch.load(model_path) for load model, and model_path should be the model fiel path
             set_peft_model_state_dict(model, adapters_weights)
         else:
             print(f"Checkpoint {checkpoint_name} not found")
@@ -228,6 +228,8 @@ def train(
         val_data = None
 
     if not ddp and torch.cuda.device_count() > 1:
+        # torch.cuda.device_count() is used to determine the number of GPUS
+        # 'not' has higher priority than 'and', so ddp==false and torch.cuda.device_count() is more than 1 will run the following code
         # keeps Trainer from trying its own DataParallelism when more than 1 gpu is available
         model.is_parallelizable = True
         model.model_parallel = True
@@ -273,7 +275,7 @@ def train(
         )
     ).__get__(model, type(model))
 
-    if torch.__version__ >= "2" and sys.platform != "win32":  # determine torch version and system whether or not win32
+    if torch.__version__ >= "2" and sys.platform != "win32":  # determine torch version and system whether or not win32, in general we use torchversion more than 2
         model = torch.compile(model)
 
     trainer.train(resume_from_checkpoint=resume_from_checkpoint)
