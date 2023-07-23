@@ -235,7 +235,7 @@ def train(
         model.is_parallelizable = True
         model.model_parallel = True
 
-    trainer = transformers.Trainer( # must be used on GPU, Trainer will be much more slower on CPU
+    trainer = Trainer( # must be used on GPU, Trainer will be much more slower on CPU
         model=model,
         train_dataset=train_data,
         eval_dataset=val_data,
@@ -271,7 +271,10 @@ def train(
             run_name=wandb_run_name if use_wandb else None, # run_name (:obj:`str`, `optional`):A descriptor for the run. Typically used for `wandb <https://www.wandb.com/>`_ logging.
         ),
         data_collator=transformers.DataCollatorForSeq2Seq(
-            tokenizer, pad_to_multiple_of=8, return_tensors="pt", padding=True
+            tokenizer, # tokenizer (PreTrainedTokenizer or PreTrainedTokenizerFast) – The tokenizer used for encoding the data.
+            pad_to_multiple_of=8, #  If set will pad the sequence to a multiple of the provided value.如果设置，会将序列填充为提供值的倍数
+            return_tensors="pt", # 如果设置，将返回张量而不是python整数列表。'pt'：返回 PyTorch torch.Tensor 对象
+            padding=True # 选择一种策略来填充返回的序列（根据模型的填充边和填充索引）True represent 填充到批次中最长的序列（如果仅提供单个序列，则不填充）
         ),
     )
     model.config.use_cache = False
