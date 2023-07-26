@@ -178,10 +178,10 @@ def train(
     config = LoraConfig( # LoRa的配置
         r=lora_r, # lora的秩，矩阵A和矩阵B相连接的宽度，r<<d
         lora_alpha=lora_alpha, # 归一化超参数，以便减少改变r rr时需要重新训练的计算量
-        target_modules=lora_target_modules, # target_modules是"q_proj"，"v_proj"
-        lora_dropout=lora_dropout,# lora层的dropout比率
+        target_modules=lora_target_modules, # target_modules是"q_proj"，"v_proj" The names of the modules to apply Lora to.
+        lora_dropout=lora_dropout,# lora层的dropout比率 The dropout probability for Lora layers.
         bias="none", # 是否可训练bias，none：均不可；all：均可；lora_only：只有lora部分的bias可训练
-        task_type="CAUSAL_LM", # The type of task to perform.
+        task_type="CAUSAL_LM", # The type of task to perform. 从PeftConfig继承来的
     )
     model = get_peft_model(model, config) # 加入PEFT策略
 
