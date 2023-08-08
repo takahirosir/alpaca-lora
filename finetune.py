@@ -235,7 +235,7 @@ def train(
         model.is_parallelizable = True
         model.model_parallel = True
 
-    trainer = Trainer( # must be used on GPU, Trainer will be much more slower on CPU
+    trainer = transformers.Trainer( # must be used on GPU, Trainer will be much more slower on CPU
         model=model,
         train_dataset=train_data,
         eval_dataset=val_data,
